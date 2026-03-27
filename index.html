@@ -556,7 +556,7 @@
                         <div class="relative h-60 p-4 flex items-center justify-center bg-white/50 group-hover:bg-white transition-colors overflow-hidden">
                             <img src="${c.image}" alt="${c.name}" class="max-w-full max-h-full object-contain transform group-hover:scale-110 transition-transform duration-700 ease-out">
                             <div class="absolute top-4 left-4 flex flex-col gap-1.5">${badgesHtml}</div>
-                            ${c.stock ? '<div class="absolute top-4 right-4 bg-emerald-500 w-2.5 h-2.5 rounded-full shadow-lg shadow-emerald-500/50" title="Disponível"></div>' : ''}
+                            ${c.stock ? '<div class="absolute top-4 right-4 bg-emerald-50/90 backdrop-blur-md text-emerald-700 border border-emerald-200 shadow-lg shadow-emerald-600/10 px-2.5 py-1 rounded-lg flex items-center gap-1.5" title="Disponibilidade Imediata"><div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div><span class="text-[9px] font-black uppercase tracking-widest">Em Estoque</span></div>' : ''}
                         </div>
                         
                         <div class="p-5 flex-grow flex flex-col pt-3">
