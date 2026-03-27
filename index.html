@@ -1,41 +1,758 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR" class="h-full scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selector de Câmeras PTZ da Sony</title>
+    <title>Sony PTZ Expert | Selector de Câmeras Profissionais</title>
+    <!-- Carregamento do Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sony: {
+                            blue: '#2e4473',
+                            dark: '#0a192f',
+                            light: '#f8fafc',
+                            accent: '#4767aa'
+                        },
+                        slate: {
+                            950: '#020617',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Outfit', 'Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.4s ease-out forwards',
+                        'pulse-subtle': 'pulseSubtle 2s infinite ease-in-out',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { transform: 'translateY(10px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+                        pulseSubtle: { '0%, 100%': { opacity: '1' }, '50%': { opacity: '0.8' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Configuração de fontes premium -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: Arial, sans-serif; }
-        h1 { color: #333; }
-        label { display: block; margin: 10px 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        
+        /* Glassmorphism Effects */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        .top-nav {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px -10px rgba(0, 0, 0, 0.05);
+        }
+
+        .mesh-gradient {
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(46, 68, 115, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(71, 103, 170, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(46, 68, 115, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(71, 103, 170, 0.08) 0px, transparent 50%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Tooltip-like animations */
+        .camera-card {
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+        .camera-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 30px 60px -15px rgba(46, 68, 115, 0.15);
+            border-color: rgba(46, 68, 115, 0.3);
+        }
+        .camera-card:hover img {
+            transform: scale(1.08);
+        }
+
+        /* Comparison tray custom height/show logic */
+        #comparison-tray {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(120%);
+        }
+        #comparison-tray.show {
+            transform: translateY(0);
+        }
+
+        .pulse-sony {
+            box-shadow: 0 0 0 0 rgba(46, 68, 115, 0.4);
+            animation: pulse-sony 2s infinite;
+        }
+
+        @keyframes pulse-sony {
+            0% { box-shadow: 0 0 0 0 rgba(46, 68, 115, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(46, 68, 115, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 68, 115, 0); }
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(135deg, #2e4473 0%, #4767aa 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Professional Modal */
+        #compare-modal {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            visibility: hidden;
+            opacity: 0;
+            backdrop-filter: blur(0px);
+        }
+        #compare-modal.show {
+            visibility: visible;
+            opacity: 1;
+            backdrop-filter: blur(8px);
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: white !important; padding: 0 !important; }
+        }
     </style>
 </head>
-<body>
-    <h1>Selecione sua Câmera PTZ da Sony</h1>
-    <form id="ptz-selector">
-        <label for="model">Modelo:</label>
-        <select id="model" name="model">
-            <option value="" disabled selected>Escolha um modelo</option>
-            <option value="SRG-X120">SRG-X120</option>
-            <option value="SRG-X400">SRG-X400</option>
-            <option value="SRG-XP1">SRG-XP1</option>
-        </select>
-        <label for="resolution">Resolução:</label>
-        <select id="resolution" name="resolution">
-            <option value="" disabled selected>Escolha a resolução</option>
-            <option value="720p">720p</option>
-            <option value="1080p">1080p</option>
-            <option value="4K">4K</option>
-        </select>
-        <button type="submit">Selecionar</button>
-    </form>
+<body class="h-full mesh-gradient font-sans text-slate-900 antialiased">
+
+    <!-- STATIC NAVIGATION -->
+    <nav class="relative z-50 top-nav no-print">
+        <div class="container mx-auto max-w-screen-2xl px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-6">
+                <!-- Fix Sony logo size: explicitly use h-6 instead of h-4.5 which was invalid in Tailwind and caused it to be giant -->
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Sony_logo.svg" alt="Sony" class="h-6 w-auto object-contain">
+                <div class="h-8 w-[1px] bg-slate-300 hidden sm:block"></div>
+                <h1 class="text-lg font-black uppercase tracking-tight text-slate-900 hidden sm:block">PTZ <span class="text-sony-blue">Expert</span></h1>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex items-center h-full">
+                    <!-- Adjusted Broadmedia logo size and height to line up correctly with button -->
+                    <img src="https://cdn.awsli.com.br/400x300/885/885467/logo/logo-adm-1-rdmdi2n2de.png" alt="Broadmedia" class="h-14 w-auto object-contain mix-blend-multiply opacity-90">
+                </div>
+                <a href="#" class="px-7 py-3 bg-sony-blue text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-sony-blue/20 hover:bg-sony-accent hover:shadow-sony-accent/30 transition-all hover:-translate-y-0.5 active:scale-95">
+                    Consultoria
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto max-w-screen-2xl px-4 sm:px-6 pt-16 pb-24">
+        
+        <!-- HERO SECTION -->
+        <div class="mb-12 animate-fade-in">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#842125]/5 text-[#842125] rounded-full border border-[#842125]/20 mb-6">
+                <span class="flex h-2 w-2 rounded-full bg-[#842125] animate-pulse shadow-[0_0_8px_rgba(132,33,37,0.6)]"></span>
+                <span class="text-[10px] font-black uppercase tracking-widest">Ferramenta de Inteligência Broadmedia</span>
+            </div>
+            <h2 class="text-4xl md:text-5xl lg:text-7xl font-black text-slate-900 mb-4 tracking-tight leading-[1.1]">
+                O Seletor de <br><span class="text-gradient">Tecnologia PTZ Sony</span>
+            </h2>
+            <p class="text-lg text-slate-500 max-w-2xl leading-relaxed">
+                Configure os requisitos técnicos do seu projeto e descubra instantaneamente a solução ideal entre todos os modelos SRG, BRC e Cinema Line.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- FILTERS SIDEBAR (lg:col-3) -->
+            <aside id="filters" class="lg:col-span-3 space-y-6 no-print lg:sticky lg:top-8">
+                <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-xl shadow-slate-200/50">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-sm font-bold uppercase text-slate-400 tracking-widest">Filtros Avançados</h3>
+                    </div>
+
+                    <div class="space-y-5">
+                        <div class="relative group">
+                            <label for="model" class="absolute -top-2 left-3 px-1 bg-white text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Buscar Modelo</label>
+                            <input type="text" id="model" class="w-full bg-transparent border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-sony-blue/20 focus:border-sony-blue transition-all outline-none" placeholder="Ex: BRC-AM7..." oninput="filterCameras()">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-2">Série</label>
+                            <select id="serie" class="w-full bg-white/50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 focus:ring-2 focus:ring-sony-blue/20 focus:border-sony-blue outline-none transition-all appearance-none cursor-pointer" onchange="filterCameras()">
+                                <option value="">Todas as Séries</option>
+                                <option value="BRC">Série BRC (Broadcast)</option>
+                                <option value="SRG">Série SRG (Pro A/V)</option>
+                                <option value="Cinema Line">Cinema Line</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-2">Resolução</label>
+                            <select id="f_res" class="w-full bg-white/50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 focus:ring-2 focus:ring-sony-blue/20 outline-none transition-all appearance-none cursor-pointer" onchange="filterCameras()">
+                                <option value="">Qualquer Resolução</option>
+                                <option value="premium">4K @ 60p Professional</option>
+                                <option value="padrao">4K @ 30p Padrão</option>
+                                <option value="custo">Full HD (1080p)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-2">Inteligência Artificial</label>
+                            <select id="f_ia" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-sony-blue/20 outline-none" onchange="filterCameras()">
+                                <option value="">Rastreio (Todas)</option>
+                                <option value="Sim">Sim (AI Auto-Tracking)</option>
+                                <option value="Não">Não (Operação Manual)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-2">Interfaces de Saída</label>
+                            <select id="f_int" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-sony-blue/20 outline-none" onchange="filterCameras()">
+                                <option value="">Todas Interfaces</option>
+                                <option value="SDI">SDI / 12G-SDI</option>
+                                <option value="HDMI">HDMI ONLY</option>
+                                <option value="USB">USB / UVC</option>
+                                <option value="SFP">Fiber Optic (SFP)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-2">Gerenciamento de Sincronia</label>
+                            <select id="f_gen" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-sony-blue/20 outline-none" onchange="filterCameras()">
+                                <option value="">Genlock (Todas)</option>
+                                <option value="Sim">Sim (Estúdio Multicâmera)</option>
+                                <option value="Não">Não Necessário</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-2">Investimento Estimado</label>
+                            <select id="f_price" class="w-full bg-white/50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 focus:ring-2 focus:ring-sony-blue/20 outline-none transition-all appearance-none cursor-pointer" onchange="filterCameras()">
+                                <option value="">Qualquer Budget</option>
+                                <option value="entrada">Versáteis (até $3.5k)</option>
+                                <option value="medio">Business/Pro ($3.5k - $7.5k)</option>
+                                <option value="high">Enterprise/Cinema ($10k+)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col gap-3">
+                        <button onclick="resetFilters()" class="w-full py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-sony-blue transition-colors">Limpar Filtros</button>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-gradient-to-br from-sony-blue to-sony-blue rounded-2xl text-white shadow-lg shadow-sony-blue/20">
+                    <p class="text-xs font-semibold opacity-80 mb-1">Dica Pro</p>
+                    <p class="text-sm font-medium leading-snug">Selecione até 4 câmeras para comparar as diferencias técnicas detalhadas no modo matriz.</p>
+                </div>
+            </aside>
+
+            <!-- RESULTS (lg:col-9) -->
+            <section class="lg:col-span-9">
+                <div class="flex items-center justify-between mb-8 px-2">
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <span id="result-count" class="bg-sony-blue text-white text-[10px] px-2 py-0.5 rounded-md">0</span>
+                        Soluções Recomendadas
+                    </h2>
+                    <div class="text-xs text-slate-400 font-medium">Ordenado por Custo-Benefício</div>
+                </div>
+
+                <div id="camera-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-slide-up">
+                    <!-- Preenchido via JS -->
+                </div>
+            </section>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="mt-20 py-12 border-t border-slate-200 no-print">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div>
+                    <img src="https://cdn.awsli.com.br/400x300/885/885467/logo/logo-adm-1-rdmdi2n2de.png" alt="Broadmedia" class="h-12 w-auto mb-4 opacity-70 contrast-125">
+                    <p class="text-sm text-slate-400">© 2026 Broadmedia. Distribuidora Autorizada Sony PTZ.</p>
+                </div>
+                <div class="flex gap-8">
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-1">Suporte Técnico</p>
+                        <a href="mailto:victor.dupret@broadmedia.com.br" class="text-sm text-slate-500 hover:text-sony-blue transition-colors">victor.dupret@broadmedia.com.br</a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 text-[10px] text-center text-slate-300 font-medium uppercase tracking-[0.2em]">
+                Sony PTZ Selector Professional Suite v2.0 - Broadmedia Intelligence Engine
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- BANDEJA DE COMPARAÇÃO MODERNA -->
+    <div id="comparison-tray" class="fixed bottom-0 left-0 right-0 z-40 px-4 pb-4 no-print pointer-events-none">
+        <div class="container mx-auto max-w-4xl pointer-events-auto">
+            <div class="bg-slate-900/90 backdrop-blur-xl border border-slate-700 p-4 rounded-3xl shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden pulse-sony">
+                <div class="flex flex-col gap-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                        <h4 class="font-bold text-white text-sm">Laboratório de Comparação</h4>
+                    </div>
+                    <ul id="compare-list" class="flex flex-wrap gap-2"></ul>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="clearComparison()" class="text-xs text-slate-400 hover:text-white font-medium">Limpar</button>
+                    <button id="compare-btn" onclick="showCompareModal()" class="bg-sony-blue hover:brightness-110 active:scale-95 text-white font-bold py-3 px-8 rounded-2xl transition-all shadow-xl shadow-sony-blue/30 disabled:opacity-50 disabled:grayscale disabled:scale-100" disabled>
+                        Gerar Matriz Técnica (<span id="compare-count">0</span>)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE COMPARAÇÃO PRO -->
+    <div id="compare-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+        <div class="bg-white/95 backdrop-blur-2xl w-full max-w-6xl h-[90vh] flex flex-col rounded-[3rem] shadow-3xl overflow-hidden border border-white/20">
+            <div class="p-10 border-b border-slate-100 flex justify-between items-center bg-white/50 sticky top-0">
+                <div>
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">Matriz <span class="text-sony-blue">Técnica</span></h2>
+                    <p class="text-sm text-slate-500 font-medium mt-1 uppercase tracking-widest">Relatório Comparativo Sony PTZ</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="printCompare()" class="flex items-center gap-2 bg-slate-50 text-slate-600 px-6 py-3 rounded-2xl text-sm font-bold hover:bg-slate-100 transition-colors">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                        Exportar Relatório
+                    </button>
+                    <button onclick="hideCompareModal()" class="w-12 h-12 flex items-center justify-center bg-slate-100 text-slate-400 rounded-2xl hover:bg-sony-blue hover:text-white transition-all">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="compare-modal-body" class="p-0 overflow-auto flex-grow bg-slate-50/50"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-32 right-8 z-[70] translate-x-32 opacity-0 transition-all duration-700 pointer-events-none">
+        <div class="bg-slate-900/90 backdrop-blur-xl text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-4">
+            <div class="w-2 h-2 rounded-full bg-sony-blue shadow-[0_0_10px_rgba(46,68,115,1)]"></div>
+            <span id="toast-message" class="text-[11px] font-black uppercase tracking-widest"></span>
+        </div>
+    </div>
+
     <script>
-        document.getElementById('ptz-selector').onsubmit = function(event) {
-            event.preventDefault();
-            const model = document.getElementById('model').value;
-            const resolution = document.getElementById('resolution').value;
-            alert('Modelo: ' + model + '\nResolução: ' + resolution);
+        const cameras = [
+            { 
+                name: 'ILME-FR7', serie: 'Cinema Line', sensor: '35 mm full-frame CMOS (BIONZ XR)', 
+                resolution: '4K QFHD até 120fps, HDR >15 stops', zoom: 'Depende da lente (ex. 24–70 mm)', 
+                ciz: 'Variável por lente (E-mount)', ia: 'Sim', 
+                interfaces: '12G-SDI, HDMI, IP', ndi: 'Opcional', genlock: 'Sim',
+                angle: 'Depende da lente', 
+                audio: 'XLR 5-pin / 3.5mm', 
+                casos: 'Cine, esportes, broadcast high-end, look cinematográfico', 
+                price: 'US$ 11.998,00', stock: true, 
+                diferencial: 'Sensor de Cinema Full-Frame, filtros ND variáveis e montagem E-Mount profissional.',
+                image: 'https://static.bhphoto.com/images/multiple_images/images750x750/1768327039_IMG_1950112.jpg', 
+                link: 'https://pro.sony/bp_BR/products/ptz-network-cameras/ilme-fr7',
+                ndi: 'Sim'
+            },
+            { 
+                name: 'BRC-AM7', serie: 'BRC', sensor: '1.0-type Stacked Exmor RS', 
+                resolution: '4K 60p (HDR)', zoom: '20x', 
+                ciz: '30× 4K / 40× HD (24–720 mm / 940 mm)', ia: 'Sim', 
+                interfaces: '12G-SDI, 3G-SDI, HDMI, IP, SFP (fibra)', ndi: 'Sim', genlock: 'Sim',
+                pan_tilt: '180°/s pan / 180°/s tilt', angle: '70.2°', 
+                audio: '2× XLR Mic/Line', 
+                casos: 'Esportes ao vivo, produção premium, estúdios, eventos grandes', 
+                price: 'US$ 13.900,00', stock: true, 
+                diferencial: 'A mais avançada da linha BRC; foco em esportes e broadcast premium com 12G-SDI.',
+                image: 'https://www.bhphotovideo.com/images/images500x500/sony_brc_am7w_brc_am7_4k60_ptz_camera_1715077063_1823491.jpg', 
+                link: 'https://pro.sony/bp_BR/products/ptz-network-cameras/brc-am7'
+            },
+            { 
+                name: 'BRC-X1000', serie: 'BRC', sensor: '1.0-type Exmor R', 
+                resolution: '4K 29.97p', zoom: '12x', 
+                ciz: '18× 4K / 24× HD (Tele-C hasta 48× HD)', ia: 'Não', 
+                interfaces: '3G-SDI ×2, HDMI', ndi: 'Não', genlock: 'Sim',
+                pan_tilt: '60°/s pan/tilt (alta velocidade)', angle: '~64.6°', 
+                audio: 'Não (via SDI/HDMI)', 
+                casos: 'Estádios, auditórios, estúdios de TV', 
+                price: 'US$ 10.300,00', stock: false, 
+                diferencial: 'Lente Zeiss de alta qualidade e excelente performance em baixíssima luz (1.7 lux).',
+                image: 'https://www.bhphotovideo.com/images/images500x500/sony_brc_x1000_4k_ptz_camera_1485264038_1303346.jpg', 
+                link: 'https://pro.sony/bp_BR/products/ptz-network-cameras/brc-x1000'
+            },
+            { 
+                name: 'BRC-X400', serie: 'BRC', sensor: '1/2.5-type Exmor R', 
+                resolution: '4K 29.97p', zoom: '20x', 
+                ciz: '30× 4K / 40× HD', ia: 'Não', 
+                interfaces: '3G-SDI, HDMI, IP', ndi: 'Sim', genlock: 'Sim',
+                pan_tilt: '300°/s pan/tilt', angle: '~70.0°', 
+                audio: '2 canais / Line', 
+                casos: 'Locais de culto, auditórios, produções remotas', 
+                price: 'US$ 5.900,00', stock: false, 
+                diferencial: 'Grande alcance de zoom (80x total em HD) e suporte nativo a NDI® opcional.',
+                image: 'https://www.bhphotovideo.com/images/images500x500/sony_brc_x400_ip_4k_pan_tilt_zoom_camera_1560773824_1496919.jpg', 
+                link: 'https://pro.sony/bp_BR/products/ptz-network-cameras/brc-x400'
+            },
+            { 
+                name: 'BRC-H800', serie: 'BRC', sensor: '1.0-type Exmor R', 
+                resolution: 'FHD 59.94p', zoom: '12x', 
+                ciz: '24× HD', ia: 'Não', 
+                interfaces: '3G-SDI ×2, HDMI', ndi: 'Não', genlock: 'Sim',
+                pan_tilt: '60°/s pan/tilt', angle: '~64.6°', 
+                audio: 'Não (via SDI/HDMI)', 
+                casos: 'Salas de conferência, locais de culto, estúdios', 
+                price: 'US$ 7.000,00', stock: false, 
+                diferencial: 'Versão Full HD da X1000; ideal para estúdios tradicionais que priorizam qualidade de imagem.',
+                image: 'https://www.bhphotovideo.com/images/images500x500/sony_brc_h800_hd_ptz_camera_1485264038_1303345.jpg', 
+                link: 'https://pro.sony/bp_BR/products/ptz-network-cameras/brc-h800'
+            },
+            { 
+                name: 'SRG-A40', serie: 'SRG', sensor: '1/2.5-type Exmor R', 
+                resolution: '4K 29.97p', zoom: '20x', 
+                ciz: '30× 4K / 40× HD', ia: 'Sim', 
+                interfaces: '3G-SDI, HDMI, IP', ndi: 'Sim', genlock: 'Não',
+                pan_tilt: '300°/s pan/tilt', angle: '~70.0°', 
+                audio: '2 canais / Line', 
+                casos: 'Ensino à distância, reuniões, ambientes médicos', 
+                price: 'US$ 3.295,00', stock: true, 
+                diferencial: 'IA integrada avançada para rastreio automático inteligente (corpo inteiro ou cintura).',
+                image: 'https://www.bhphotovideo.com/images/images500x500/sony_srga40_4k_built_in_ai_ptz_1681729352_1761643.jpg', 
+                link: 'https://pro.sony/bp_BR/products/ptz-network-cameras/srg-a40'
+            },
+            { 
+                name: 'SRG-A12', serie: 'SRG', sensor: '1/2.5-type Exmor R', 
+                resolution: '4K 29.97p', zoom: '12x', 
+                ciz: '~24× HD', ia: 'Sim', 
+                interfaces: '3G-SDI, HDMI, IP', ndi: 'Sim', genlock: 'Não',
+                pan_tilt: '300°/s pan/tilt', angle: '~70.0°', 
+                audio: '2 canais / Line', 
+                casos: 'Salas de aula, conferências de negócios, governo', 
+                price: 'US$ 2.695,00', stock: true, 
+                diferencial: 'IA de rastreio otimizada para salas de aula e reuniões médias com custo-benefício imbatível.',
+                image: 'https://www.bhphotovideo.com/images/images500x500/sony_srga40_4k_built_in_ai_ptz_1681729352_1761643.jpg', 
+                link: 'https://pro.sony/bp_BR/products/ptz-network-cameras/srg-a12'
+            },
+            { 
+                name: 'SRG-X40UH', serie: 'SRG', sensor: '1/2.5-type Exmor R', 
+                resolution: '4K 29.97p', zoom: '20x', 
+                ciz: '30× 4K / 40× HD', ia: 'Não', 
+                interfaces: 'HDMI, USB (UVC)', ndi: 'Não', genlock: 'Não',
+                pan_tilt: '300°/s pan/tilt', angle: '~70.0°', 
+                audio: 'Não (via USB)', 
+                casos: 'Pequenas salas de reunião, tele-educação USB', 
+                price: 'US$ 2.695,00', stock: false, 
+                diferencial: 'Conexão simplificada Plug & Play via USB; ideal para videoconferência profesional rápida.',
+                image: 'https://www.bhphotovideo.com/images/images500x500/sony_srgx40uh_4k_hdmi_usb_optical_20x_ptz_1669046524_1733674.jpg', 
+                link: 'https://pro.sony/bp_BR/products/ptz-network-cameras/srg-x40uh'
+            },
+            { 
+                name: 'SRG-X120', serie: 'SRG', sensor: '1/2.5-type Exmor R', 
+                resolution: '1080p (4K via licença)', zoom: '12x', 
+                ciz: '~24× HD', ia: 'Não', 
+                interfaces: '3G-SDI, HDMI, IP, USB', ndi: 'Sim', genlock: 'Não',
+                pan_tilt: '300°/s pan/tilt', angle: '~70.0°', 
+                audio: 'limitada', 
+                casos: 'Pequenas salas, tele-educação, streaming IP', 
+                price: 'descontinuada', stock: false, 
+                diferencial: 'Modelo robusto para streaming IP; suporta atualização para 4K via licença opcional.',
+                image: 'https://m.media-amazon.com/images/I/51VYGcHzMpL._AC_SL1200_.jpg', 
+                link: 'https://pro.sony/bp_BR/products/ptz-network-cameras/srg-x120'
+            }
+        ];
+
+        let compareItems = [];
+
+        const parsePrice = (priceStr) => {
+            if (priceStr.includes('descontinuada')) return 0;
+            return parseFloat(priceStr.replace('US$', '').replace(/\./g, '').replace(',', '.'));
         };
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(0)';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(32px)';
+            }, 3000);
+        }
+
+        function filterCameras() {
+            const f_model = document.getElementById('model').value.toLowerCase();
+            const f_serie = document.getElementById('serie').value;
+            const f_res = document.getElementById('f_res').value;
+            const f_ia = document.getElementById('f_ia').value;
+            const f_int = document.getElementById('f_int').value;
+            const f_gen = document.getElementById('f_gen').value;
+            const f_price = document.getElementById('f_price').value;
+
+            const filtered = cameras.filter(c => {
+                const price = parsePrice(c.price);
+                
+                // Lógica de Resolução
+                let matchRes = true;
+                if (f_res === 'premium') matchRes = c.resolution.includes('60p') || c.resolution.includes('120fps');
+                else if (f_res === 'padrao') matchRes = c.resolution.includes('4K') && !c.resolution.includes('60p');
+                else if (f_res === 'custo') matchRes = c.resolution.toLowerCase().includes('fhd') || c.resolution.includes('1080p');
+
+                // Lógica de Preço
+                let matchPrice = true;
+                if (f_price === 'entrada') matchPrice = price > 0 && price <= 3500;
+                else if (f_price === 'medio') matchPrice = price > 3500 && price <= 7500;
+                else if (f_price === 'high') matchPrice = price > 10000;
+
+                return (!f_model || c.name.toLowerCase().includes(f_model)) &&
+                       (!f_serie || c.serie === f_serie) &&
+                       (matchRes) &&
+                       (!f_ia || c.ia === f_ia) &&
+                       (!f_int || c.interfaces.includes(f_int)) &&
+                       (!f_gen || c.genlock === f_gen) &&
+                       (matchPrice);
+            });
+
+            filtered.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
+            document.getElementById('result-count').textContent = filtered.length;
+            displayResults(filtered);
+        }
+
+        function displayResults(list) {
+            const container = document.getElementById('camera-list');
+            container.innerHTML = '';
+            
+            if (list.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-20 text-center"><p class="text-slate-400 font-medium">Nenhuma câmera corresponde aos filtros selecionados.</p></div>`;
+                return;
+            }
+
+            list.forEach((c, index) => {
+                const isChecked = compareItems.some(item => item.name === c.name) ? 'checked' : '';
+                
+                let badgesHtml = '';
+                if (c.resolution.includes('4K')) badgesHtml += `<span class="bg-sony-blue/10 text-sony-blue text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-tight">4K Nativo</span>`;
+                if (c.genlock === 'Sim') badgesHtml += `<span class="bg-violet-600/10 text-violet-700 text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-tight">Genlock</span>`;
+                if (c.ia === 'Sim') badgesHtml += `<span class="bg-emerald-600/10 text-emerald-700 text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-tight">Rastreio IA</span>`;
+                if (c.interfaces.includes('12G')) badgesHtml += `<span class="bg-slate-900 text-white text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-tighter">12G-SDI</span>`;
+
+                const card = `
+                    <div class="camera-card group glass-card rounded-3xl overflow-hidden flex flex-col border border-slate-200/50 hover:border-sony-blue/30" style="animation-delay: ${index * 50}ms">
+                        <div class="relative h-60 p-4 flex items-center justify-center bg-white/50 group-hover:bg-white transition-colors overflow-hidden">
+                            <img src="${c.image}" alt="${c.name}" class="max-w-full max-h-full object-contain transform group-hover:scale-110 transition-transform duration-700 ease-out">
+                            <div class="absolute top-4 left-4 flex flex-col gap-1.5">${badgesHtml}</div>
+                            ${c.stock ? '<div class="absolute top-4 right-4 bg-emerald-500 w-2.5 h-2.5 rounded-full shadow-lg shadow-emerald-500/50" title="Disponível"></div>' : ''}
+                        </div>
+                        
+                        <div class="p-5 flex-grow flex flex-col pt-3">
+                            <div class="mb-3">
+                                <p class="text-[10px] font-black text-sony-blue uppercase tracking-[0.2em] mb-0.5 opacity-70">${c.serie} Matrix</p>
+                                <h3 class="text-xl font-black text-slate-900 leading-tight">${c.name}</h3>
+                                <p class="text-lg font-medium text-slate-400 mt-0.5">${c.price}</p>
+                            </div>
+
+                            <div class="space-y-2.5 mb-5">
+                                <div class="flex items-center gap-3 text-sm font-medium text-slate-700">
+                                    <svg class="w-5 h-5 text-sony-blue flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                    <span class="truncate">${c.resolution}</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-sm font-medium text-slate-700">
+                                    <svg class="w-5 h-5 text-sony-blue flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                                    <span>Zoom: ${c.zoom.split(' / ')[0]}</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-sm font-medium text-slate-700">
+                                    <svg class="w-5 h-5 text-sony-blue flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h.01M16 20h.01M12 16h.01M8 8h.01M12 4h.01M12 20h.01" stroke-width="2" /></svg>
+                                    <span class="truncate">${c.interfaces.split(',')[0]} + IP Streaming</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-5 p-3.5 bg-slate-50 border-l-2 border-sony-blue rounded-r-xl">
+                                <p class="text-[11px] font-black text-sony-blue uppercase tracking-widest mb-1 opacity-70">Vantagem Principal</p>
+                                <p class="text-[13px] font-semibold text-slate-800 leading-relaxed italic">"${c.diferencial}"</p>
+                            </div>
+
+                            <div class="mt-auto pt-4 flex items-center justify-between gap-4">
+                                <a href="${c.link}" target="_blank" class="flex-grow py-3 px-4 bg-slate-950 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-sony-blue transition-colors text-center">Website</a>
+                                <label class="flex items-center gap-2 cursor-pointer group/check">
+                                    <div class="relative">
+                                        <input type="checkbox" id="comp-${c.name}" data-name="${c.name}" onchange="toggleCompare(this)" class="peer sr-only" ${isChecked}>
+                                        <div class="w-10 h-10 rounded-2xl border-2 border-slate-200 peer-checked:border-sony-blue peer-checked:bg-sony-blue/10 flex items-center justify-center transition-all">
+                                            <svg class="w-5 h-5 text-slate-300 peer-checked:text-sony-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" class="origin-center rotate-0 transition-transform peer-checked:rotate-45" /></svg>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        function toggleCompare(el) {
+            const name = el.dataset.name;
+            const camera = cameras.find(c => c.name === name);
+            if (el.checked) {
+                if (compareItems.length >= 4) { showToast("Máximo: 4 câmeras"); el.checked = false; return; }
+                compareItems.push(camera);
+            } else { compareItems = compareItems.filter(item => item.name !== name); }
+            updateTray();
+        }
+
+        function updateTray() {
+            const list = document.getElementById('compare-list');
+            list.innerHTML = '';
+            compareItems.forEach(item => {
+                list.innerHTML += `
+                    <li class="group flex items-center gap-2 bg-slate-800 text-white px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter border border-slate-700 border-dashed">
+                        ${item.name} 
+                        <span class="cursor-pointer text-slate-500 hover:text-white transition-colors" onclick="removeComp('${item.name}')">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </span>
+                    </li>`;
+            });
+            document.getElementById('compare-count').textContent = compareItems.length;
+            document.getElementById('compare-btn').disabled = compareItems.length < 2;
+            document.getElementById('comparison-tray').classList.toggle('show', compareItems.length > 0);
+        }
+
+        function removeComp(name) {
+            compareItems = compareItems.filter(item => item.name !== name);
+            updateTray();
+            filterCameras();
+        }
+
+        function clearComparison() {
+            compareItems = [];
+            updateTray();
+            filterCameras();
+        }
+
+        function resetFilters() {
+            document.getElementById('model').value = '';
+            document.querySelectorAll('select').forEach(s => s.value = '');
+            filterCameras();
+            showToast("Filtros reajustados");
+        }
+
+        function showCompareModal() {
+            const body = document.getElementById('compare-modal-body');
+            const features = [
+                { key: 'diferencial', label: 'Diferencial Pro' },
+                { key: 'resolution', label: 'Saída Máxima' },
+                { key: 'sensor', label: 'Arquitetura do Sensor' },
+                { key: 'zoom', label: 'Lente Zoom' },
+                { key: 'ciz', label: 'Zoom Inteligente' },
+                { key: 'interfaces', label: 'Conectividade I/O' },
+                { key: 'ia', label: 'Motor de Rastreio IA' },
+                { key: 'genlock', label: 'Sincronia Broadcast' },
+                { key: 'ndi', label: 'Suporte NDI®' },
+                { key: 'pan_tilt', label: 'Desempenho P/T' },
+                { key: 'audio', label: 'Áudio Digital' },
+                { key: 'casos', label: 'Cenários Sugeridos' }
+            ];
+
+            let table = `
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="sticky left-0 bg-white z-20 p-8 text-left text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 min-w-[200px]">Matriz Técnica</th>
+                            ${compareItems.map(item => `
+                                <th class="p-8 border-b border-slate-100 bg-slate-50/30">
+                                    <div class="flex flex-col items-center">
+                                        <img src="${item.image}" class="h-16 w-auto object-contain mb-4">
+                                        <span class="text-xl font-black text-slate-900">${item.name}</span>
+                                        <span class="text-xs text-sony-blue font-bold uppercase mt-1">${item.price}</span>
+                                    </div>
+                                </th>
+                            `).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${features.map(f => `
+                            <tr class="group">
+                                <td class="sticky left-0 bg-white z-20 p-6 border-b border-slate-50 font-bold text-slate-500 text-xs uppercase tracking-tight group-hover:bg-slate-50 transition-colors">${f.label}</td>
+                                ${compareItems.map(item => {
+                                    let val = item[f.key];
+                                    let content = val;
+                                    let cellClass = "p-6 border-b border-slate-50 text-sm group-hover:bg-slate-50/50 transition-colors";
+                                    
+                                    if (val === 'Sim') content = '<span class="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full font-bold text-[10px]">INTEGRADO</span>';
+                                    else if (val === 'Não') content = '<span class="text-slate-300 font-medium">N/A</span>';
+                                    else if (val === 'Opcional') content = '<span class="bg-amber-50 text-amber-600 px-3 py-1 rounded-full font-bold text-[10px]">UPGRADE</span>';
+                                    
+                                    if (f.key === 'diferencial') cellClass += " text-sony-blue font-bold italic";
+                                    
+                                    return `<td class="${cellClass}">${content}</td>`;
+                                }).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            body.innerHTML = table;
+            document.getElementById('compare-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideCompareModal() { 
+            document.getElementById('compare-modal').classList.remove('show'); 
+            document.body.style.overflow = 'auto';
+        }
+
+        function printCompare() {
+            const content = document.getElementById('compare-modal-body').innerHTML;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Relatório Técnico Sony PTZ - Broadmedia</title>
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+                        body { font-family: 'Inter', sans-serif; }
+                        table { border-collapse: collapse; width: 100%; }
+                        th, td { border: 1px solid #e2e8f0; padding: 12px; font-size: 10px; }
+                        th { background: #f8fafc; }
+                    </style>
+                </head>
+                <body class="p-8">
+                    <div class="flex justify-between items-center border-b-2 border-sony-blue pb-4 mb-8">
+                        <div>
+                            <h1 class="text-2xl font-black uppercase italic">Sony PTZ Matrix Report</h1>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Broadmedia Distribution Intelligence</p>
+                        </div>
+                        <img src="https://cdn.awsli.com.br/400x300/885/885467/logo/logo-adm-1-rdmdi2n2de.png" class="h-10">
+                    </div>
+                    ${content}
+                    <div class="mt-8 pt-4 border-t border-slate-100 text-[8px] text-slate-400 text-center font-bold uppercase tracking-[0.3em]">
+                        Confidencial - Broadmedia Distribuidora 2026 - www.broadmedia.com.br
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            setTimeout(() => { printWindow.print(); }, 800);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            filterCameras();
+        });
     </script>
 </body>
 </html>
