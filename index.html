@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selector Sony PTZ</title>
+</head>
+<body>
+    <h1>Selecione sua câmera Sony PTZ</h1>
+    <label for="camera">Câmera:</label>
+    <select id="camera">
+        <option value="camera1">Câmera 1</option>
+        <option value="camera2">Câmera 2</option>
+        <option value="camera3">Câmera 3</option>
+        <option value="camera4">Câmera 4</option>
+    </select>
+    <button onclick="selectCamera()">Selecionar</button>
+
+    <script>
+    function selectCamera() {
+        const camera = document.getElementById('camera').value;
+        alert('Câmera selecionada: ' + camera);
+    }
+    </script>
+</body>
+</html>
