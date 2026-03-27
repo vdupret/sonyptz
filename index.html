@@ -3,24 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selector Sony PTZ</title>
+    <title>Selector de Câmeras PTZ da Sony</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { color: #333; }
+        label { display: block; margin: 10px 0; }
+    </style>
 </head>
 <body>
-    <h1>Selecione sua câmera Sony PTZ</h1>
-    <label for="camera">Câmera:</label>
-    <select id="camera">
-        <option value="camera1">Câmera 1</option>
-        <option value="camera2">Câmera 2</option>
-        <option value="camera3">Câmera 3</option>
-        <option value="camera4">Câmera 4</option>
-    </select>
-    <button onclick="selectCamera()">Selecionar</button>
-
+    <h1>Selecione sua Câmera PTZ da Sony</h1>
+    <form id="ptz-selector">
+        <label for="model">Modelo:</label>
+        <select id="model" name="model">
+            <option value="" disabled selected>Escolha um modelo</option>
+            <option value="SRG-X120">SRG-X120</option>
+            <option value="SRG-X400">SRG-X400</option>
+            <option value="SRG-XP1">SRG-XP1</option>
+        </select>
+        <label for="resolution">Resolução:</label>
+        <select id="resolution" name="resolution">
+            <option value="" disabled selected>Escolha a resolução</option>
+            <option value="720p">720p</option>
+            <option value="1080p">1080p</option>
+            <option value="4K">4K</option>
+        </select>
+        <button type="submit">Selecionar</button>
+    </form>
     <script>
-    function selectCamera() {
-        const camera = document.getElementById('camera').value;
-        alert('Câmera selecionada: ' + camera);
-    }
+        document.getElementById('ptz-selector').onsubmit = function(event) {
+            event.preventDefault();
+            const model = document.getElementById('model').value;
+            const resolution = document.getElementById('resolution').value;
+            alert('Modelo: ' + model + '\nResolução: ' + resolution);
+        };
     </script>
 </body>
 </html>
